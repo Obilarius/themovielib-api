@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const Ninja = require("../models/ninja")
+const Ninja = require("../models/ninja");
 
 // get a list of ninjas from the db
 router.get("/", (req, res, next) => {
   Ninja.find()
-    .then((ninjas) => {
+    .then(ninjas => {
       res.status(200).send(ninjas);
     })
     .catch(next);
@@ -25,20 +25,25 @@ router.get("/", (req, res, next) => {
 
 // add a new ninja to the db
 router.post("/", (req, res, next) => {
-  Ninja.create(req.body).then(ninja => {
-    res.status(200).send(ninja);
-  }).catch(next);
+  Ninja.create(req.body)
+    .then(ninja => {
+      res.status(200).send(ninja);
+    })
+    .catch(next);
 });
 
 // update a ninja in the db
 router.put("/:id", (req, res, next) => {
-  Ninja.findByIdAndUpdate({
+  Ninja.findByIdAndUpdate(
+    {
       _id: req.params.id
-    }, req.body)
-    .then((ninja) => {
-      Ninja.findById(req.params.id).then((ninja) => {
-        res.status(200).send(ninja)
-      })
+    },
+    req.body
+  )
+    .then(ninja => {
+      Ninja.findById(req.params.id).then(ninja => {
+        res.status(200).send(ninja);
+      });
     })
     .catch(next);
 });
@@ -46,10 +51,10 @@ router.put("/:id", (req, res, next) => {
 // delete a ninja in the db
 router.delete("/:id", (req, res, next) => {
   Ninja.findByIdAndRemove({
-      _id: req.params.id
-    })
-    .then((ninja) => {
-      res.status(200).send(ninja)
+    _id: req.params.id
+  })
+    .then(ninja => {
+      res.status(200).send(ninja);
     })
     .catch(next);
 });
