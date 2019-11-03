@@ -8,9 +8,12 @@ function paginatedResults(model) {
 
     const results = {};
 
-    if (endIndex < (await model.countDocuments().exec()))
-      results.nextPage = page + 1;
-    if (startIndex > 0) results.prevPage = page - 1;
+    results.page = page;
+    results.total_results = await model.countDocuments().exec();
+    results.total_pages = Math.ceil(results.total_results / limit);
+
+    if (endIndex < results.total_results) results.next_page = page + 1;
+    if (startIndex > 0) results.prev_page = page - 1;
 
     try {
       results.results = await model
