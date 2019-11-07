@@ -5,8 +5,8 @@ const router = express.Router({
 const axios = require("axios");
 const LibraryMovie = require("../models/library_movie");
 
-const tmdb_url = process.env.TMDB_URL;
-const tmdb_apikey = process.env.TMDB_API_KEY;
+const tmdb_url = "https://api.themoviedb.org/3/";
+const tmdb_apikey = "285a3801961b83d5dedcb2b3ec252cdf";
 
 function randomDate(start, end) {
   return new Date(
