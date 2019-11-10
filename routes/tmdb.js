@@ -16,13 +16,9 @@ function randomDate(start, end) {
 
 router.get("*", (req, res, next) => {
   const query = req.query;
-  const url =
-    tmdb_url +
-    query.endpoint +
-    "?api_key=" +
-    tmdb_apikey +
-    "&" +
-    query.param.join("&");
+  const url = tmdb_url + query.endpoint + "?api_key=" + tmdb_apikey + "&";
+
+  if (query.param != null) url += query.param.join("&");
 
   axios
     .get(url)
