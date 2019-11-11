@@ -18,13 +18,15 @@ const LibrarySchema = new Schema({
 const UserSchema = new Schema({
   username: {
     type: String,
-    unique: true
+    unique: true,
+    required: true
   },
   email: {
     type: String,
-    unique: true
+    unique: true,
+    required: true
   },
-  password: String,
+  password: { type: String, required: true },
   givenname: String,
   surname: String,
   birthday: Date,
@@ -36,6 +38,7 @@ const UserSchema = new Schema({
   website: String,
   bio: String,
   avatar: String,
+  is_admin: { type: Boolean, default: false },
   watchlist: Array,
   diary: [DiarySchema],
   library: [LibrarySchema]
