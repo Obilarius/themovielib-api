@@ -15,34 +15,37 @@ const LibrarySchema = new Schema({
 });
 
 // create movie Schema & model
-const UserSchema = new Schema({
-  username: {
-    type: String,
-    unique: true,
-    required: true
+const UserSchema = new Schema(
+  {
+    username: {
+      type: String,
+      unique: true,
+      required: [true, "Username is already used."]
+    },
+    email: {
+      type: String,
+      unique: true,
+      required: [true, "Email is already used."]
+    },
+    password: { type: String, required: true },
+    givenname: String,
+    surname: String,
+    birthday: Date,
+    Location: {
+      zip: Number,
+      city: String,
+      country: String
+    },
+    website: String,
+    bio: String,
+    avatar: String,
+    is_admin: { type: Boolean, default: false },
+    watchlist: Array,
+    diary: [DiarySchema],
+    library: [LibrarySchema]
   },
-  email: {
-    type: String,
-    unique: true,
-    required: true
-  },
-  password: { type: String, required: true },
-  givenname: String,
-  surname: String,
-  birthday: Date,
-  Location: {
-    zip: Number,
-    city: String,
-    country: String
-  },
-  website: String,
-  bio: String,
-  avatar: String,
-  is_admin: { type: Boolean, default: false },
-  watchlist: Array,
-  diary: [DiarySchema],
-  library: [LibrarySchema]
-});
+  { timestamps: true }
+);
 
 const User = mongoose.model("user", UserSchema);
 

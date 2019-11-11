@@ -2,7 +2,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 // set up express app
@@ -28,6 +27,7 @@ app.use(bodyParser.json());
 app.use("/lib", require("./routes/library"));
 // app.use("/ninjas", require("./routes/ninjas"));
 app.use("/tmdb", require("./routes/tmdb"));
+app.use("/user", require("./routes/user"));
 
 // error handling middleware
 app.use((err, req, res, next) => {
@@ -35,16 +35,6 @@ app.use((err, req, res, next) => {
     error: err.message
   });
 });
-
-const password = "Top Secret";
-bcrypt.hash(password, 10).then(
-  hash => {
-    console.log("Your hash: ", hash);
-  },
-  err => {
-    console.log(err);
-  }
-);
 
 // port
 const port = process.env.PORT || 4000;
