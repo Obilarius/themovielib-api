@@ -2,33 +2,48 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const DiarySchema = new Schema({
-  movie_id: String,
-  viewed_on: Date,
+  movieId: String,
+  viewedOn: Date,
   rating: Number
+}, {
+  timestamps: true
 });
 
 const LibrarySchema = new Schema({
-  movie_id: String,
-  added_on: Date,
+  movieId: String,
+  addedOn: Date,
   medium: String,
   viewed: Boolean
+}, {
+  timestamps: true
 });
+
+const WatchlistSchema = new Schema({
+  movieId: String,
+}, {
+  timestamps: true
+})
 
 // create movie Schema & model
 const UserSchema = new Schema({
   username: {
     type: String,
-    unique: true
+    unique: [true, "Username already exists"],
+    required: [true, "Username is required"]
   },
   email: {
     type: String,
-    unique: true
+    unique: [true, "Email already exists"],
+    required: [true, "Email is required"]
   },
-  password: String,
+  password: {
+    type: String,
+    required: [true, "Pasword is required"]
+  },
   givenname: String,
   surname: String,
   birthday: Date,
-  Location: {
+  location: {
     zip: Number,
     city: String,
     country: String
@@ -36,9 +51,15 @@ const UserSchema = new Schema({
   website: String,
   bio: String,
   avatar: String,
-  watchlist: Array,
+  isAdmin: {
+    type: String,
+    default: false
+  },
+  watchlist: [WatchlistSchema],
   diary: [DiarySchema],
   library: [LibrarySchema]
+}, {
+  timestamps: true
 });
 
 const User = mongoose.model("user", UserSchema);

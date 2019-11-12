@@ -16,17 +16,15 @@ mongoose.connect("mongodb+srv://apiuser:sascha5262@themovielib-7zind.mongodb.net
 });
 mongoose.Promise = global.Promise;
 
-// CORS
 app.use(cors());
-
-app.use(express.static("public"));
-
+// app.use(express.static("public"));
 app.use(bodyParser.json());
 
 // init routes
 app.use("/lib", require("./routes/library"));
-// app.use("/ninjas", require("./routes/ninjas"));
 app.use("/tmdb", require("./routes/tmdb"));
+app.use("/users", require("./routes/users"));
+app.use("/jwt", require("./routes/jwt"));
 
 // error handling middleware
 app.use((err, req, res, next) => {
