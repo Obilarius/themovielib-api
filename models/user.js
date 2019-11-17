@@ -1,37 +1,59 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const DiarySchema = new Schema({
-  movie_id: String,
-  viewed_on: Date,
-  rating: Number
-});
+const DiarySchema = new Schema(
+  {
+    movieId: String,
+    viewedOn: Date,
+    rating: Number
+  },
+  {
+    timestamps: true
+  }
+);
 
-const LibrarySchema = new Schema({
-  movie_id: String,
-  added_on: Date,
-  medium: String,
-  viewed: Boolean
-});
+const LibrarySchema = new Schema(
+  {
+    movieId: String,
+    addedOn: Date,
+    medium: String,
+    viewed: Boolean
+  },
+  {
+    timestamps: true
+  }
+);
+
+const WatchlistSchema = new Schema(
+  {
+    movieId: String
+  },
+  {
+    timestamps: true
+  }
+);
 
 // create movie Schema & model
 const UserSchema = new Schema(
   {
     username: {
       type: String,
-      unique: true,
-      required: [true, "Username is already used."]
+      unique: [true, "Username already exists"],
+      required: [true, "Username is required"]
     },
     email: {
       type: String,
-      unique: true,
-      required: [true, "Email is already used."]
+      unique: [true, "Email already exists"],
+      required: [true, "Email is required"]
     },
-    password: { type: String, required: true },
+    password: {
+      type: String,
+      required: [true, "Pasword is required"]
+    },
     givenname: String,
     surname: String,
     birthday: Date,
-    Location: {
+    location: {
       zip: Number,
       city: String,
       country: String
@@ -39,12 +61,17 @@ const UserSchema = new Schema(
     website: String,
     bio: String,
     avatar: String,
-    is_admin: { type: Boolean, default: false },
-    watchlist: Array,
+    isAdmin: {
+      type: String,
+      default: false
+    },
+    watchlist: [WatchlistSchema],
     diary: [DiarySchema],
     library: [LibrarySchema]
   },
-  { timestamps: true }
+  {
+    timestamps: true
+  }
 );
 
 const User = mongoose.model("user", UserSchema);
