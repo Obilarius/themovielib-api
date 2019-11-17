@@ -27,6 +27,7 @@ app.use(bodyParser.json());
 app.use("/lib", require("./routes/library"));
 app.use("/tmdb", require("./routes/tmdb"));
 app.use("/users", require("./routes/users"));
+app.use("/movie", require("./routes/movie"));
 app.use("/jwt", require("./routes/jwt"));
 
 // error handling middleware
