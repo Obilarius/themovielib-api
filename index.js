@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const isAuthorized = require("./middleware/auth");
 require("dotenv").config();
 
 // set up express app
@@ -22,6 +23,8 @@ mongoose.Promise = global.Promise;
 app.use(cors());
 // app.use(express.static("public"));
 app.use(bodyParser.json());
+
+app.use(isAuthorized);
 
 // init routes
 app.use("/lib", require("./routes/library"));

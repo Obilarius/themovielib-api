@@ -26,13 +26,15 @@ router.get("/:userid", (req, res, next) => {
 
 // add a new movie to the library
 // {
-// 	"movieId": "5dd267559c2724d25a151378",
-// 	"medium" : "DVD",
-// 	"viewed" : true
+//  "data": {
+// 	  "movieId": "5dd267559c2724d25a151378",
+// 	  "medium" : "DVD",
+// 	  "viewed" : true
+//  }
 // }
 router.post("/:userid", (req, res, next) => {
   const userId = req.params.userid;
-  const entry = req.body;
+  const entry = req.body.data;
 
   User.findByIdAndUpdate(
     userId,
