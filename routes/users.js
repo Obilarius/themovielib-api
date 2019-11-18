@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
+const Library = require("../models/user");
 const isAuthorized = require("../middleware/auth");
 
 router.get("/", isAuthorized, (req, res, next) => {

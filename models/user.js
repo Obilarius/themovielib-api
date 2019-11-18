@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const DiarySchema = new Schema(
   {
-    movieId: String,
+    movieId: { type: String, required: true, index: true },
     viewedOn: Date,
     rating: Number
   },
@@ -12,26 +12,34 @@ const DiarySchema = new Schema(
   }
 );
 
+// const Diary = mongoose.model("diary", DiarySchema);
+// module.exports = Diary;
+
 const LibrarySchema = new Schema(
   {
-    movieId: String,
-    addedOn: Date,
+    movieId: { type: String, required: true, index: true },
     medium: String,
-    viewed: Boolean
+    viewed: { type: Boolean, default: false }
   },
   {
     timestamps: true
   }
 );
 
+// const Library = mongoose.model("library", LibrarySchema);
+// module.exports = Library;
+
 const WatchlistSchema = new Schema(
   {
-    movieId: String
+    movieId: { type: String, required: true, index: true }
   },
   {
     timestamps: true
   }
 );
+
+// const Watchlist = mongoose.model("watchlist", WatchlistSchema);
+// module.exports = Watchlist;
 
 // create movie Schema & model
 const UserSchema = new Schema(
@@ -75,5 +83,4 @@ const UserSchema = new Schema(
 );
 
 const User = mongoose.model("user", UserSchema);
-
 module.exports = User;

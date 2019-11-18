@@ -1,42 +1,46 @@
 const express = require("express");
 const router = express.Router();
 const paginatedResults = require("../middleware/paginatedResults");
-const LibraryMovie = require("../models/library_movie");
-const Library = require("../models/library")
+const User = require("../models/user");
 
 // get a list of movie from the db
-router.get("/", paginatedResults(LibraryMovie), (req, res, next) => {
-  //   LibraryMovie.find()
-  //     .then(movie => {
-  //       res.status(200).send(movie);
-  //     })
-  //     .catch(next);
-  res.json(res.paginatedResults);
-});
+// router.get("/", paginatedResults(LibraryMovie), (req, res, next) => {
+//   //   LibraryMovie.find()
+//   //     .then(movie => {
+//   //       res.status(200).send(movie);
+//   //     })
+//   //     .catch(next);
+//   res.json(res.paginatedResults);
+// });
 
-// add a new movie to the db
-router.post("/", (req, res, next) => {
-  LibraryMovie.create(req.body)
-    .then(movie => {
-      res.status(200).send(movie);
+// Get Library from User
+router.get("/:userid", (req, res, next) => {
+  const userId = req.params.userid;
+
+  User.findById(userId, "library")
+    .then(user => {
+      res.send(user);
     })
     .catch(next);
 });
 
+// add a new movie to the library
+// {
+// 	"movieId": "5dd267559c2724d25a151378",
+// 	"medium" : "DVD",
+// 	"viewed" : true
+// }
+router.post("/:userid", (req, res, next) => {
+  const userId = req.params.userid;
+  const entry = req.body;
 
-router.get("/library/", (req, res, next) => {
-  Library.find()
-    .then(libEntrys => {
-      res.send(libEntrys);
-    })
-    .catch(next);
-  res.send("bib");
-});
-
-router.post("/library/", (req, res, next) => {
-  Library.create(req.body)
-    .then(libEntry => {
-      res.send(libEntry);
+  User.findByIdAndUpdate(
+    userId,
+    { $push: { library: entry } },
+    { safe: true, new: true }
+  )
+    .then(user => {
+      res.send(user);
     })
     .catch(next);
 });
