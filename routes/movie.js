@@ -11,6 +11,7 @@ router.get("/", paginatedResults(Movie), (req, res, next) => {
   //       res.status(200).send(movie);
   //     })
   //     .catch(next);
+
   res.json(res.paginatedResults);
 });
 
