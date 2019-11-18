@@ -24,6 +24,7 @@ app.use(cors());
 // app.use(express.static("public"));
 app.use(bodyParser.json());
 
+// Auth middleware for all routes
 app.use(isAuthorized);
 
 // init routes

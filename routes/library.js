@@ -3,16 +3,6 @@ const router = express.Router();
 const paginatedResults = require("../middleware/paginatedResults");
 const User = require("../models/user");
 
-// get a list of movie from the db
-// router.get("/", paginatedResults(LibraryMovie), (req, res, next) => {
-//   //   LibraryMovie.find()
-//   //     .then(movie => {
-//   //       res.status(200).send(movie);
-//   //     })
-//   //     .catch(next);
-//   res.json(res.paginatedResults);
-// });
-
 // Get Library from User
 router.get("/:userid", (req, res, next) => {
   const userId = req.params.userid;
@@ -46,32 +36,5 @@ router.post("/:userid", (req, res, next) => {
     })
     .catch(next);
 });
-
-// update a movie in the db
-// router.put("/:id", (req, res, next) => {
-//   LibraryMovie.findByIdAndUpdate(
-//     {
-//       _id: req.params.id
-//     },
-//     req.body
-//   )
-//     .then(movie => {
-//       Movie.findById(req.params.id).then(movie => {
-//         res.status(200).send(movie);
-//       });
-//     })
-//     .catch(next);
-// });
-
-// // delete a movie in the db
-// router.delete("/:id", (req, res, next) => {
-//   LibraryMovie.findByIdAndRemove({
-//     _id: req.params.id
-//   })
-//     .then(movie => {
-//       res.status(200).send(movie);
-//     })
-//     .catch(next);
-// });
 
 module.exports = router;
