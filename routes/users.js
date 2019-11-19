@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const privateKey = require("../config/authPrivateKey");
 const User = require("../models/user");
+
 
 
 // Handle Signup
@@ -84,6 +87,58 @@ router.post("/signup", async (req, res, next) => {
     })
   }
 });
+
+// Handle Login
+router.post("/login", (req, res, next) => {
+  User.findOne({
+      $or: [{
+        email: req.body.email
+      }, {
+        username: req.body.username
+      }]
+    })
+    .then(user => {
+
+      if (user == null) {
+        return res.status(401).json({
+          message: "Auth failed"
+        })
+      }
+
+      bcrypt.compare(req.body.password, user.password, (err, result) => {
+        // error on compare
+        if (err) {
+          return res.status(401).json({
+            message: "Auth failed"
+          })
+        }
+
+        // Login successful
+        if (result) {
+          const token = jwt.sign({
+              userId: user._id,
+              email: user.email,
+              username: user.username,
+            },
+            process.env.JWT_SECRET, {
+              expiresIn: "1h"
+            })
+
+          return res.status(200).json({
+            message: "Auth successful",
+            token: token
+          })
+        }
+
+        // password dont match
+        res.status(401).json({
+          message: "Auth failed"
+        })
+      })
+    })
+    .catch(next)
+});
+
 
 router.delete("/:userId", (req, res, next) => {
   User.remove({
