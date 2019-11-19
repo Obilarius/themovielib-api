@@ -2,26 +2,24 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
-const Library = require("../models/user");
-const isAuthorized = require("../middleware/auth");
 
-router.get("/", isAuthorized, (req, res, next) => {
-  User.find()
-    .then(users => {
-      res.status(200).send(users);
-    })
-    .catch(next);
-});
 
-// Register Handle
-router.post("/register", async (req, res, next) => {
-  const { username, email, password, password2 } = req.body;
+// Handle Signup
+router.post("/signup", async (req, res, next) => {
+  const {
+    username,
+    email,
+    password,
+    password2
+  } = req.body;
   let errors = [];
 
   if (!username || !email || !password || !password2) {
     errors.push({
       msg: "Please enter all fields"
     });
+    res.status(400).send(errors);
+    return;
   }
 
   if (password != password2) {
@@ -61,38 +59,42 @@ router.post("/register", async (req, res, next) => {
   });
 
   if (errors.length > 0) {
-    res.status(400).send(errors);
+    res.status(409).send(errors);
   } else {
     // Validation passed
-    // Create new User
-    const newUser = new User({
-      username,
-      email,
-      password: ""
-    });
 
-    // Hash Password
-    bcrypt.genSalt(10, function(err, salt) {
-      bcrypt.hash(password, salt, function(err, hash) {
-        if (err) {
-          errors.push({
-            msg: "Error"
-          });
-          res.status(400).send(errors);
-        }
-
-        // Set password to hashed
-        newUser.password = hash;
-        // Save user
-        newUser
+    bcrypt.hash(password, 10, (err, hash) => {
+      if (err) {
+        return res.status(500).json({
+          error: err
+        });
+      } else {
+        const user = new User({
+          username: username,
+          email: email,
+          password: hash
+        })
+        user
           .save()
-          .then(user => {
-            res.send(user);
+          .then(result => {
+            res.status(201).send(result)
           })
           .catch(next);
-      });
-    });
+      }
+    })
   }
 });
+
+router.delete("/:userId", (req, res, next) => {
+  User.remove({
+      _id: req.params.userId
+    })
+    .then(result => {
+      res.status(200).json({
+        message: "User deleted"
+      })
+    })
+    .catch(next)
+})
 
 module.exports = router;

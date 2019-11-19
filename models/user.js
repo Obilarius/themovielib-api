@@ -51,17 +51,17 @@ const WatchlistSchema = new Schema({
 const UserSchema = new Schema({
   username: {
     type: String,
-    unique: [true, "Username already exists"],
-    required: [true, "Username is required"]
+    unique: true,
+    required: true
   },
   email: {
     type: String,
-    unique: [true, "Email already exists"],
-    required: [true, "Email is required"]
+    unique: true,
+    required: true
   },
   password: {
     type: String,
-    required: [true, "Pasword is required"]
+    required: true
   },
   givenname: String,
   surname: String,
