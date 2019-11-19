@@ -10,8 +10,7 @@ const app = express();
 
 // connect to mongoDB
 mongoose.connect(
-  "mongodb+srv://apiuser:sascha5262@themovielib-7zind.mongodb.net/themovielib?retryWrites=true&w=majority",
-  {
+  "mongodb+srv://apiuser:sascha5262@themovielib-7zind.mongodb.net/themovielib?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
@@ -32,7 +31,7 @@ app.use("/lib", require("./routes/library"));
 app.use("/tmdb", require("./routes/tmdb"));
 app.use("/users", require("./routes/users"));
 app.use("/movie", require("./routes/movie"));
-app.use("/jwt", require("./routes/jwt"));
+app.use("/auth", require("./routes/auth"));
 
 // error handling middleware
 app.use((err, req, res, next) => {
@@ -44,6 +43,6 @@ app.use((err, req, res, next) => {
 // port
 const port = process.env.PORT || 4000;
 // listen for requests
-app.listen(port, function() {
+app.listen(port, function () {
   console.log(`Server now listening on port ${port}`);
 });

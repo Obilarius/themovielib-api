@@ -3,9 +3,8 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const privateKey = require("../config/authPrivateKey");
 
-router.get("/jwt", (req, res, next) => {
-  const token = jwt.sign(
-    {
+router.get("/login", (req, res, next) => {
+  const token = jwt.sign({
       body: "stuff"
     },
     privateKey

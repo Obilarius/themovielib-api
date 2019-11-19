@@ -39,7 +39,7 @@ router.post("/", (req, res, next) => {
 
   Movie.findOneAndUpdate(filter, update, options)
     .then(movie => {
-      res.status(200).send(movie);
+      res.status(201).send(movie);
     })
     .catch(next);
 });

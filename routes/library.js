@@ -7,9 +7,24 @@ const User = require("../models/user");
 router.get("/:userid", (req, res, next) => {
   const userId = req.params.userid;
 
-  User.findById(userId, "library")
+  User.findById(userId)
+    .select("_id library")
+    .populate("library.movie")
     .then(user => {
-      res.send(user);
+      const response = {
+        userId: user._id,
+        count: user.library.length,
+        movies: user.library.map(movie => {
+          return {
+            movie: movie.movie,
+            medium: movie.medium,
+            viewed: movie.viewed,
+            createdAt: movie.createdAt
+          }
+        })
+      }
+      res.json(response);
+      // res.send(user);
     })
     .catch(next);
 });
@@ -27,12 +42,17 @@ router.post("/:userid", (req, res, next) => {
   const entry = req.body.data;
 
   User.findByIdAndUpdate(
-    userId,
-    { $push: { library: entry } },
-    { safe: true, new: true }
-  )
+      userId, {
+        $push: {
+          library: entry
+        }
+      }, {
+        safe: true,
+        new: true
+      }
+    )
     .then(user => {
-      res.send(user);
+      res.status(201).send(user);
     })
     .catch(next);
 });
