@@ -25,6 +25,7 @@ app.use(bodyParser.json());
 
 // unprotected routes
 app.use("/users", require("./routes/users"));
+app.use("/movie", require("./routes/movie"));
 
 // Auth middleware for all routes
 app.use(isAuthorized);
@@ -32,8 +33,7 @@ app.use(isAuthorized);
 // protected routes
 app.use("/lib", require("./routes/library"));
 app.use("/tmdb", require("./routes/tmdb"));
-app.use("/movie", require("./routes/movie"));
-app.use("/auth", require("./routes/auth"));
+
 
 // error handling middleware
 app.use((err, req, res, next) => {

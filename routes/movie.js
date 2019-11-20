@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Axios = require("axios")
 const paginatedResults = require("../middleware/paginatedResults");
+const isAuthorized = require("../middleware/auth");
 const Movie = require("../models/movie");
 
 // get a list of movie from the db
@@ -12,7 +13,14 @@ router.get("/", paginatedResults(Movie), (req, res, next) => {
   //     })
   //     .catch(next);
 
-  res.json(res.paginatedResults);
+
+  res.paginatedResults.results.forEach(movie => {
+    movie.images.backdrops = movie.images.backdrops.slice(0, 5);
+    movie.images.posters = movie.images.posters.slice(0, 5);
+  });
+
+  // res.json(res.paginatedResults.results[0].images.backdrops.length);
+  res.json(res.paginatedResults)
 });
 
 // get a movie by id
@@ -27,7 +35,7 @@ router.get("/:tmdb_id", (req, res, next) => {
 });
 
 // add or update a movie to the db
-router.post("/", (req, res, next) => {
+router.post("/", isAuthorized, (req, res, next) => {
   const filter = {
     tmdb_id: req.body.tmdb_id
   };
@@ -60,7 +68,7 @@ router.post("/", (req, res, next) => {
 // });
 
 // delete a movie in the db
-router.delete("/:id", (req, res, next) => {
+router.delete("/:id", isAuthorized, (req, res, next) => {
   Movie.findByIdAndRemove({
       _id: req.params.id
     })
@@ -72,7 +80,7 @@ router.delete("/:id", (req, res, next) => {
 
 
 
-router.get("/demo/images/", (req, res, next) => {
+router.get("/demo/images/", isAuthorized, (req, res, next) => {
   Movie.find()
     .then(async movies => {
       await Promise.all(movies.map(async (movie, index) => {
@@ -95,7 +103,7 @@ router.get("/demo/images/", (req, res, next) => {
 })
 
 
-router.get("/demo/:page", (req, res, next) => {
+router.get("/demo/:page", isAuthorized, (req, res, next) => {
   const page = req.params.page;
   const tmdb_api_url_popular = "https://api.themoviedb.org/3/movie/popular?api_key=285a3801961b83d5dedcb2b3ec252cdf&language=de-de&page=" + page;
   const movie_urls = [];
