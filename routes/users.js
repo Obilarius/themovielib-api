@@ -3,10 +3,12 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
+const isAuthorized = require("../middleware/auth")
+const User = require("../models/user");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './uploads/');
+    cb(null, './uploads/avatars');
   },
   filename: function (req, file, cb) {
     const date = new Date().toISOString()
@@ -32,8 +34,7 @@ const upload = multer({
   }
 });
 
-const isAuthorized = require("../middleware/auth")
-const User = require("../models/user");
+
 
 // Handle Signup
 router.post("/signup", async (req, res, next) => {
@@ -181,15 +182,18 @@ router.delete("/:userId", isAuthorized, (req, res, next) => {
     .catch(next);
 });
 
-router.patch("/:userId", upload.single("avatar"), (req, res, next) => {
-  console.log(req.file);
-  // User.findByIdAndUpdate(req.params.userId, req.body)
-  //   .then(result => {
-  //     res.status(200).send(result);
-  //   })
-  //   .catch(next);
+router.patch("/:userId", isAuthorized, upload.single("avatar"), (req, res, next) => {
+  User.findByIdAndUpdate(req.params.userId, {
+      ...req.body,
+      avatar: req.file.path
+    })
+    .then(result => {
+      res.status(200).json({
+        message: "User updatet"
+      });
+    })
+    .catch(next);
 
-  res.send(req.body);
 });
 
 module.exports = router;

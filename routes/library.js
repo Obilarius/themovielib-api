@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const paginatedResults = require("../middleware/paginatedResults");
+const isAuthorized = require("../middleware/auth");
 const User = require("../models/user");
 
 // Get Library from User
-router.get("/:userid", (req, res, next) => {
+router.get("/:userid", isAuthorized, (req, res, next) => {
   const userId = req.params.userid;
 
   User.findById(userId)
@@ -37,7 +38,7 @@ router.get("/:userid", (req, res, next) => {
 // 	  "viewed" : true
 //  }
 // }
-router.post("/:userid", (req, res, next) => {
+router.post("/:userid", isAuthorized, (req, res, next) => {
   const userId = req.params.userid;
   const entry = req.body.data;
 

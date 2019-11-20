@@ -21,16 +21,12 @@ mongoose.Promise = global.Promise;
 
 app.use(cors());
 // app.use(express.static("public"));
+app.use("/uploads/", express.static("uploads"));
 app.use(bodyParser.json());
 
-// unprotected routes
+// routes
 app.use("/users", require("./routes/users"));
 app.use("/movie", require("./routes/movie"));
-
-// Auth middleware for all routes
-app.use(isAuthorized);
-
-// protected routes
 app.use("/lib", require("./routes/library"));
 app.use("/tmdb", require("./routes/tmdb"));
 
