@@ -2,10 +2,38 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const privateKey = require("../config/authPrivateKey");
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads/');
+  },
+  filename: function (req, file, cb) {
+    const date = new Date().toISOString()
+    const name = date.replace(/:/g, '-') + "_" + file.originalname
+    cb(null, name);
+  }
+})
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype == "image/jpeg" || file.mimetype == "image/png") {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+}
+
+const upload = multer({
+  // fileSize in Byte
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 1024 * 1024 * 0.2
+  }
+});
+
+const isAuthorized = require("../middleware/auth")
 const User = require("../models/user");
-
-
 
 // Handle Signup
 router.post("/signup", async (req, res, next) => {
@@ -76,15 +104,15 @@ router.post("/signup", async (req, res, next) => {
           username: username,
           email: email,
           password: hash
-        })
+        });
         user
           .save()
           .then(result => {
-            res.status(201).send(result)
+            res.status(201).send(result);
           })
           .catch(next);
       }
-    })
+    });
   }
 });
 
@@ -92,17 +120,18 @@ router.post("/signup", async (req, res, next) => {
 router.post("/login", (req, res, next) => {
   User.findOne({
       $or: [{
-        email: req.body.email
-      }, {
-        username: req.body.username
-      }]
+          email: req.body.email
+        },
+        {
+          username: req.body.username
+        }
+      ]
     })
     .then(user => {
-
       if (user == null) {
         return res.status(401).json({
           message: "Auth failed"
-        })
+        });
       }
 
       bcrypt.compare(req.body.password, user.password, (err, result) => {
@@ -110,7 +139,7 @@ router.post("/login", (req, res, next) => {
         if (err) {
           return res.status(401).json({
             message: "Auth failed"
-          })
+          });
         }
 
         // Login successful
@@ -118,38 +147,49 @@ router.post("/login", (req, res, next) => {
           const token = jwt.sign({
               userId: user._id,
               email: user.email,
-              username: user.username,
+              username: user.username
             },
             process.env.JWT_SECRET, {
               expiresIn: "1h"
-            })
+            }
+          );
 
           return res.status(200).json({
             message: "Auth successful",
             token: token
-          })
+          });
         }
 
         // password dont match
         res.status(401).json({
           message: "Auth failed"
-        })
-      })
+        });
+      });
     })
-    .catch(next)
+    .catch(next);
 });
 
-
-router.delete("/:userId", (req, res, next) => {
+router.delete("/:userId", isAuthorized, (req, res, next) => {
   User.remove({
       _id: req.params.userId
     })
     .then(result => {
       res.status(200).json({
         message: "User deleted"
-      })
+      });
     })
-    .catch(next)
-})
+    .catch(next);
+});
+
+router.patch("/:userId", upload.single("avatar"), (req, res, next) => {
+  console.log(req.file);
+  // User.findByIdAndUpdate(req.params.userId, req.body)
+  //   .then(result => {
+  //     res.status(200).send(result);
+  //   })
+  //   .catch(next);
+
+  res.send(req.body);
+});
 
 module.exports = router;
