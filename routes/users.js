@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const isAuthorized = require("../middleware/auth")
 const User = require("../models/user");
+const privateKey = require("../config/authPrivateKey")
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -150,7 +151,7 @@ router.post("/login", (req, res, next) => {
               email: user.email,
               username: user.username
             },
-            process.env.JWT_SECRET, {
+            privateKey, {
               expiresIn: "1h"
             }
           );
