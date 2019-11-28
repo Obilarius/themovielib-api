@@ -122,7 +122,7 @@ router.post("/signup", async (req, res, next) => {
 router.post("/login", (req, res, next) => {
   User.findOne({
       $or: [{
-          email: req.body.email
+          email: req.body.username
         },
         {
           username: req.body.username
@@ -149,7 +149,9 @@ router.post("/login", (req, res, next) => {
           const token = jwt.sign({
               userId: user._id,
               email: user.email,
-              username: user.username
+              username: user.username,
+              isAdmin: user.isAdmin,
+              avatar: user.avatar
             },
             privateKey, {
               expiresIn: "1h"
