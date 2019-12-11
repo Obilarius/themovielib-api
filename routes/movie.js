@@ -26,7 +26,7 @@ router.get("/", paginatedResults(Movie), (req, res, next) => {
 // get a movie by id
 router.get("/:tmdb_id", (req, res, next) => {
   Movie.findOne({
-      tmdb_id: request.params.tmdb_id
+      tmdb_id: req.params.tmdb_id
     })
     .then(movie => {
       res.status(200).send(movie);
