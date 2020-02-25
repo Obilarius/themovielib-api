@@ -5,8 +5,8 @@ const isAuthorized = require("../middleware/auth");
 const User = require("../models/user");
 
 // Get Library from User
-router.get("/:userid", isAuthorized, (req, res, next) => {
-  const userId = req.params.userid;
+router.get("/", isAuthorized, (req, res, next) => {
+  const userId = res.jwt_decoded.userId;
 
   User.findById(userId)
     .select("_id library")
@@ -38,8 +38,9 @@ router.get("/:userid", isAuthorized, (req, res, next) => {
 // 	  "viewed" : true
 //  }
 // }
-router.post("/:userid", isAuthorized, (req, res, next) => {
-  const userId = req.params.userid;
+
+router.post("/", isAuthorized, (req, res, next) => {
+  const userId = res.jwt_decoded.userId;
   const entry = req.body.data;
 
   User.findByIdAndUpdate(

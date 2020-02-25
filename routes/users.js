@@ -196,7 +196,6 @@ router.patch("/:userId", isAuthorized, upload.single("avatar"), (req, res, next)
       });
     })
     .catch(next);
-
 });
 
 module.exports = router;
