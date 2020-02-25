@@ -2,33 +2,37 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const isAuthorized = require("./middleware/auth");
 require("dotenv").config();
+
+// Passport Config
+require("./config/passport")
 
 // set up express app
 const app = express();
 
-// connect to mongoDB
+// Connect to mongoDB
 mongoose.connect(
-  "mongodb+srv://apiuser:sascha5262@themovielib-7zind.mongodb.net/themovielib?retryWrites=true&w=majority", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-    useCreateIndex: true
-  }
-);
-mongoose.Promise = global.Promise;
+    process.env.MONGODB_CONNECTION, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false,
+      useCreateIndex: true
+    }
+  )
+  .then(console.log("MongoDB Connected..."))
+  .catch(err => console.log(err))
 
+// Middleware
 app.use(cors());
-// app.use(express.static("public"));
-app.use("/uploads/", express.static("uploads"));
+app.use(express.static("public")); // show HTML File in Browser
+app.use("/uploads/", express.static("uploads")); // for FileUpload
 app.use(bodyParser.json());
 
-// routes
+// Routes
 app.use("/users", require("./routes/users"));
-app.use("/movie", require("./routes/movie"));
-app.use("/lib", require("./routes/library"));
-app.use("/tmdb", require("./routes/tmdb"));
+// app.use("/movie", require("./routes/movie"));
+// app.use("/lib", require("./routes/library"));
+// app.use("/tmdb", require("./routes/tmdb"));
 
 
 // error handling middleware

@@ -1,44 +1,53 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const multer = require("multer");
-const isAuthorized = require("../middleware/auth")
-const User = require("../models/user");
-const privateKey = require("../config/authPrivateKey")
+const passport = require("passport");
+const jwt = require("jsonwebtoken")
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './uploads/avatars');
-  },
-  filename: function (req, file, cb) {
-    const date = new Date().toISOString()
-    const name = date.replace(/:/g, '-') + "_" + file.originalname
-    cb(null, name);
-  }
+const User = require("../models/User");
+const bcrypt = require("bcrypt");
+
+// Handle Login with Passport Local Startegy
+router.post("/login", (req, res) => {
+  passport.authenticate('local', {
+    session: false
+  }, (err, user, info) => {
+    if (err || !user) {
+      return res.status(400).json({
+        message: 'Something is not right',
+        user: user
+      });
+    }
+    req.login(user, {
+      session: false
+    }, (err) => {
+      if (err) {
+        res.send(err);
+      }
+
+      console.log(user)
+
+      const jwt_payload = {
+        userId: user._id,
+        email: user.email,
+        username: user.username,
+        isAdmin: user.isAdmin,
+        avatar: user.avatar
+      }
+      // generate a signed jon web token with the contents of user object and return it in the response
+      const token = jwt.sign(
+        jwt_payload,
+        process.env.JWT_SECRET, {
+          expiresIn: "1h"
+        });
+      return res.json({
+        token
+      });
+    });
+  })(req, res);
 })
 
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype == "image/jpeg" || file.mimetype == "image/png") {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-}
-
-const upload = multer({
-  // fileSize in Byte
-  storage: storage,
-  fileFilter: fileFilter,
-  limits: {
-    fileSize: 1024 * 1024 * 0.2
-  }
-});
-
-
-
-// Handle Signup
-router.post("/signup", async (req, res, next) => {
+// Handle Registration
+router.post("/register", async (req, res, next) => {
   const {
     username,
     email,
@@ -47,6 +56,7 @@ router.post("/signup", async (req, res, next) => {
   } = req.body;
   let errors = [];
 
+  // Check required fields
   if (!username || !email || !password || !password2) {
     errors.push({
       msg: "Please enter all fields"
@@ -55,6 +65,7 @@ router.post("/signup", async (req, res, next) => {
     return;
   }
 
+  // Check passwords match
   if (password != password2) {
     errors.push({
       key: "password",
@@ -62,6 +73,7 @@ router.post("/signup", async (req, res, next) => {
     });
   }
 
+  // Check password length
   if (password.length < 6) {
     errors.push({
       key: "password",
@@ -69,6 +81,7 @@ router.post("/signup", async (req, res, next) => {
     });
   }
 
+  // Check if email already registered
   await User.findOne({
     email: email
   }).then(user => {
@@ -80,6 +93,7 @@ router.post("/signup", async (req, res, next) => {
     }
   });
 
+  // Check if username already registered
   await User.findOne({
     username: username
   }).then(user => {
@@ -91,11 +105,11 @@ router.post("/signup", async (req, res, next) => {
     }
   });
 
+
   if (errors.length > 0) {
-    res.status(409).send(errors);
+    res.status(400).send(errors);
   } else {
     // Validation passed
-
     bcrypt.hash(password, 10, (err, hash) => {
       if (err) {
         return res.status(500).json({
@@ -110,92 +124,12 @@ router.post("/signup", async (req, res, next) => {
         user
           .save()
           .then(result => {
-            res.status(201).send(result);
+            res.status(200).send(result);
           })
           .catch(next);
       }
     });
   }
-});
-
-// Handle Login
-router.post("/login", (req, res, next) => {
-  User.findOne({
-      $or: [{
-          email: req.body.username
-        },
-        {
-          username: req.body.username
-        }
-      ]
-    })
-    .then(user => {
-      if (user == null) {
-        return res.status(401).json({
-          message: "Auth failed"
-        });
-      }
-
-      bcrypt.compare(req.body.password, user.password, (err, result) => {
-        // error on compare
-        if (err) {
-          return res.status(401).json({
-            message: "Auth failed"
-          });
-        }
-
-        // Login successful
-        if (result) {
-          const token = jwt.sign({
-              userId: user._id,
-              email: user.email,
-              username: user.username,
-              isAdmin: user.isAdmin,
-              avatar: user.avatar
-            },
-            privateKey, {
-              expiresIn: "1h"
-            }
-          );
-
-          return res.status(200).json({
-            message: "Auth successful",
-            token: token
-          });
-        }
-
-        // password dont match
-        res.status(401).json({
-          message: "Auth failed"
-        });
-      });
-    })
-    .catch(next);
-});
-
-router.delete("/:userId", isAuthorized, (req, res, next) => {
-  User.remove({
-      _id: req.params.userId
-    })
-    .then(result => {
-      res.status(200).json({
-        message: "User deleted"
-      });
-    })
-    .catch(next);
-});
-
-router.patch("/:userId", isAuthorized, upload.single("avatar"), (req, res, next) => {
-  User.findByIdAndUpdate(req.params.userId, {
-      ...req.body,
-      avatar: req.file.path
-    })
-    .then(result => {
-      res.status(200).json({
-        message: "User updatet"
-      });
-    })
-    .catch(next);
-});
+})
 
 module.exports = router;
