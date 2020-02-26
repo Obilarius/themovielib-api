@@ -29,10 +29,10 @@ app.use("/uploads/", express.static("uploads")); // for FileUpload
 app.use(bodyParser.json());
 
 // Routes
-app.use("/users", require("./routes/users"));
+app.use("/user", require("./routes/user"));
 // app.use("/movie", require("./routes/movie"));
 // app.use("/lib", require("./routes/library"));
-// app.use("/tmdb", require("./routes/tmdb"));
+app.use("/tmdb", require("./routes/tmdb"));
 
 
 // error handling middleware
