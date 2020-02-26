@@ -7,7 +7,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 
 // Handle Login with Passport Local Startegy
-router.post("/login", (req, res) => {
+router.post("/login", (req, res, next) => {
   passport.authenticate('local', {
     session: false
   }, (err, user, info) => {
@@ -131,5 +131,13 @@ router.post("/register", async (req, res, next) => {
     });
   }
 })
+
+
+// Get all User Infos
+router.get('/profile', passport.authenticate('jwt', {
+  session: false
+}), (req, res, next) => {
+  res.send(req.user);
+});
 
 module.exports = router;

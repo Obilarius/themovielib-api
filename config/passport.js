@@ -1,5 +1,8 @@
 const passport = require("passport")
 const LocalStrategy = require("passport-local").Strategy;
+const passportJWT = require("passport-jwt");
+const JWTStrategy = passportJWT.Strategy;
+const ExtractJWT = passportJWT.ExtractJwt;
 const bcrypt = require("bcrypt");
 
 // Load User Model
@@ -42,3 +45,20 @@ passport.use(
       .catch(err => console.log(err))
   })
 );
+
+
+passport.use(new JWTStrategy({
+    jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+    secretOrKey: process.env.JWT_SECRET
+  },
+  function (jwtPayload, cb) {
+    //find the user in db if needed. This functionality may be omitted if you store everything you'll need in JWT payload.
+    return User.findById(jwtPayload.userId)
+      .then(user => {
+        return cb(null, user);
+      })
+      .catch(err => {
+        return cb(err);
+      });
+  }
+));
