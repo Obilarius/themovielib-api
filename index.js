@@ -31,7 +31,7 @@ app.use(bodyParser.json());
 // Routes
 app.use("/user", require("./routes/user"));
 app.use("/movie", require("./routes/movie"));
-// app.use("/lib", require("./routes/library"));
+app.use("/library", require("./routes/library"));
 app.use("/tmdb", require("./routes/tmdb"));
 
 

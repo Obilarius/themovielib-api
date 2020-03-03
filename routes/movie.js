@@ -3,7 +3,7 @@ const router = express.Router();
 const Axios = require("axios")
 const passport = require("passport");
 const paginatedResults = require("../middleware/paginatedResults");
-const Movie = require("../models/movie");
+const Movie = require("../models/Movie");
 
 // get a list of movie from the db
 router.get("/", paginatedResults(Movie), (req, res, next) => {

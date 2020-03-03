@@ -1,46 +1,28 @@
 const express = require("express");
 const router = express.Router();
 const paginatedResults = require("../middleware/paginatedResults");
-const isAuthorized = require("../middleware/auth");
-const User = require("../models/user");
+const passport = require("passport");
+const User = require("../models/User");
+const Movie = require("../models/Movie");
 
 // Get Library from User
-router.get("/", isAuthorized, (req, res, next) => {
-  const userId = res.jwt_decoded.userId;
-
-  User.findById(userId)
-    .select("_id library")
-    .populate("library.movie")
-    .then(user => {
-      const response = {
-        userId: user._id,
-        count: user.library.length,
-        movies: user.library.map(movie => {
-          return {
-            movie: movie.movie,
-            medium: movie.medium,
-            viewed: movie.viewed,
-            createdAt: movie.createdAt
-          }
-        })
-      }
-      res.json(response);
-      // res.send(user);
-    })
-    .catch(next);
+router.get("/", paginatedResults(Movie), (req, res, next) => {
+  // res.send(req.user.library)
+  res.send(res.paginatedResults);
 });
 
 // add a new movie to the library
 // {
 //  "data": {
-// 	  "movieId": "5dd267559c2724d25a151378",
+// 	  "id": "290859",
 // 	  "medium" : "DVD",
 // 	  "viewed" : true
 //  }
 // }
 
-router.post("/", isAuthorized, (req, res, next) => {
-  const userId = res.jwt_decoded.userId;
+router.post("/", passport.authenticate('jwt', {
+  session: false
+}), (req, res, next) => {
   const entry = req.body.data;
 
   User.findByIdAndUpdate(
